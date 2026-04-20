@@ -1,0 +1,121 @@
+// Prisma schema for Mutua Madrileña Road Assistance Dashboard
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Incident status enum
+enum IncidentStatus {
+  ACTIVE      // Call in progress or awaiting resolution
+  RESOLVED    // Successfully resolved
+  CANCELLED   // Cancelled by customer or system
+}
+
+// Incident severity enum
+enum Severity {
+  LOW         // Minor issue, no injuries
+  MEDIUM      // Moderate issue, vehicle immobile
+  HIGH        // Serious accident, possible injuries
+  CRITICAL    // Life-threatening, requires immediate response
+}
+
+// Incident phase enum - tracks progress within an ACTIVE incident
+enum IncidentPhase {
+  GATHERING_INFO   // Call just started, no data yet
+  INFO_COLLECTED   // Policy/customer info received
+  CONFIRMED        // Location, vehicle, description confirmed
+  CRANE_ASSIGNED   // Crane service contacted and assigned
+}
+
+// Main incident table - represents a road assistance call
+model Incident {
+  id              String         @id @default(uuid())
+  ticketNumber    String         @unique @default(cuid()) @map("ticket_number")
+  status          IncidentStatus @default(ACTIVE)
+  phase           IncidentPhase  @default(GATHERING_INFO)
+  
+  // Customer information
+  customerName    String?        @map("customer_name")
+  customerPhone   String?        @map("customer_phone")
+  policyNumber    String?        @map("policy_number")
+  
+  // Location (updated mid-call when customer provides it)
+  latitude        Float?
+  longitude       Float?
+  address         String?
+  
+  // Vehicle information
+  vehiclePlate    String?        @map("vehicle_plate")
+  vehicleModel    String?        @map("vehicle_model")
+  vehicleBrand    String?        @map("vehicle_brand")
+  
+  // Incident details
+  description     String?
+  comments        String?        // Safety notes, additional comments
+  severity        Severity       @default(MEDIUM)
+  
+  // Crane/roadside assistance
+  craneAssigned   Boolean        @default(false) @map("crane_assigned")
+  craneETA        DateTime?      @map("crane_eta")
+  craneCompany    String?        @map("crane_company")
+  cranePhone      String?        @map("crane_phone")
+  
+  // HappyRobot integration
+  happyRobotRunLink String?      @map("happyrobot_run_link")
+  
+  // Timestamps
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  resolvedAt      DateTime?      @map("resolved_at")
+  
+  // Relations
+  logs            IncidentLog[]
+
+  @@map("incidents")
+}
+
+// Incident log entries - timeline of events during the call
+model IncidentLog {
+  id          String   @id @default(uuid())
+  
+  incidentId  String   @map("incident_id")
+  incident    Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  
+  timestamp   DateTime @default(now())
+  message     String   // Log message content
+  source      String   // "AGENT", "SYSTEM", "CRANE", "CUSTOMER"
+  status      String   @default("INFO") // "INFO", "SUCCESS", "WARNING", "ERROR"
+  
+  // Optional metadata (e.g., location update coordinates, crane details)
+  metadata    Json?
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("incident_logs")
+}
+
+// Application settings
+model Settings {
+  id                    String @id @default("default")
+  
+  // HappyRobot integration
+  defaultHappyRobotLink String @default("") @map("default_happyrobot_link")
+  
+  // SLA configuration (in minutes)
+  slaWarningMinutes     Int    @default(15) @map("sla_warning_minutes")
+  slaCriticalMinutes    Int    @default(30) @map("sla_critical_minutes")
+  
+  // Centro de Control - incident visibility threshold (in hours)
+  controlTowerHours     Int    @default(5) @map("control_tower_hours")
+  
+  // Timestamps
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
