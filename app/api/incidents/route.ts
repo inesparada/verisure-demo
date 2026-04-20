@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { broadcastEvent } from "@/lib/pusher-server";
 
-// Generate ticket number in format MM-YYYY-XXXX
+// Generate ticket number in format VS-YYYY-XXXX
 async function generateTicketNumber(): Promise<string> {
   const year = new Date().getFullYear();
-  const prefix = `MM-${year}-`;
+  const prefix = `VS-${year}-`;
   
   // Find the highest ticket number for this year
   const lastIncident = await prisma.incident.findFirst({
