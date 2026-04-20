@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "./ThemeProvider";
 import type { Incident } from "@/hooks";
 
-// Spain/Madrid view
-const SPAIN_VIEW = { lat: 40.4168, lng: -3.7038, zoom: 5.5 };
-const MADRID_VIEW = { lat: 40.4168, lng: -3.7038, zoom: 11 };
+// Madrid view — center between Salamanca and Chamartín where incidents cluster
+const SPAIN_VIEW = { lat: 40.4350, lng: -3.6900, zoom: 10.5 };
+const MADRID_VIEW = { lat: 40.4350, lng: -3.6900, zoom: 12.5 };
 
 interface IncidentMapProps {
   incidents: Incident[];
@@ -138,8 +138,8 @@ export function IncidentMap({
     const phaseTexts: Record<string, string> = {
       GATHERING_INFO: "Recogiendo info",
       INFO_COLLECTED: "Cliente identificado",
-      CONFIRMED: "Pendiente grúa",
-      CRANE_ASSIGNED: "Grúa en camino",
+      CONFIRMED: "Técnico asignado",
+      CRANE_ASSIGNED: "Técnico en camino",
     };
     return phaseTexts[incident.phase] || incident.status;
   };
