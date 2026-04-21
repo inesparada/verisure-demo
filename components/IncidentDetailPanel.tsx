@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { 
-  X, 
-  AlertTriangle, 
-  Phone, 
-  MapPin, 
-  Car, 
-  Clock, 
+  X,
+  AlertTriangle,
+  Phone,
+  MapPin,
+  Clock,
   CheckCircle,
   ExternalLink,
   Truck,
@@ -316,7 +315,7 @@ export function IncidentDetailPanel({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
-          {/* Customer & Vehicle Info - Editable */}
+          {/* Customer Info - Editable */}
           <div className="p-4 space-y-1 border-b border-gray-200 dark:border-zinc-800">
             <EditableField
               value={incident.customerName}
@@ -337,13 +336,6 @@ export function IncidentDetailPanel({
               fieldKey="address"
               icon={<MapPin className="h-4 w-4" />}
               placeholder="Dirección"
-              onSave={handleFieldSave}
-            />
-            <EditableField
-              value={incident.vehiclePlate ? `${incident.vehicleBrand || ""} ${incident.vehicleModel || ""} - ${incident.vehiclePlate}`.trim() : null}
-              fieldKey="vehicle_plate"
-              icon={<Car className="h-4 w-4" />}
-              placeholder="Vehículo en la propiedad (marca modelo - matrícula)"
               onSave={handleFieldSave}
             />
             <div className="flex items-center gap-2 text-sm py-1">
